@@ -1,54 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import useHelloWorld from './custom-hooks/useHelloWorld.js';
 
 import './style.css';
-
-const useDate = () => {
-  const date = new Date();
-
-
-  const getDay = () => {
-    return date.getDay();
-  };
-
-  const getMonth = () => {
-    return date.getMonth();
-  };
-
-  const addDay = (numberOfDays) => {
-    //N.B if day after adding is greater than number of days for that month, date returned should be a new month date
-
-    const newDate = new Date(date);
-    newDate.setDate(newDate.getDate() + numberOfDays);
-
-    if (newDate.getMonth() !== date.getMonth()) {
-      newDate.setMonth(date.getMonth() + 1);
-    }
-
-    date = newDate;
-  };
-
-  const addMonth = (numberOfMonths) => {
-    //N.B if month after adding is greater than 11, date returned should be a new year
-
-    const newDate = new Date(date);
-    newDate.setMonth(newDate.getMonth() + numberOfMonths);
-
-    if (newDate.getMonth() < date.getMonth()) {
-      newDate.setFullYear(date.getFullYear() + 1);
-    }
-
-    date = newDate;
-  };
-
-  return { date, getDay, getMonth, addDay, addMonth};
-};
 
 export default function App() {
   const [posts, setPosts] = useState([]);
   const [input, setInput] = useState('');
-  const { value, setValue } = useHelloWorld();
   const [editPostId, setEditPostId] = useState(null);
 
   const handlePostEdit  = (postId) => {
@@ -68,9 +25,11 @@ export default function App() {
     }
   };
 
-  const { date, getDay, getMonth } = useDate();
+  const handleDeletePost = (postId) => {
+    const updatedPosts = posts.filter((post) => post.id !== postId);
+    setPosts(updatedPosts);
+  };
 
-  console.log('----->', value);
 
   // when a component mounts
   // when a component's state or props changes
@@ -102,41 +61,89 @@ export default function App() {
   useEffect(() => {
     console.log('Input changed');
   }, [input]);
-  
+
 
   return (
     <div>
-     {posts.map((post) => (
-        <div style={{ border: '1px dashed', marginBottom: '5px' }} key={post.id}>
+     {posts.map((post, index) => (
+      <div
+        style={{
+          width: '50%', 
+          margin: '0 auto', 
+          marginBottom: '10px',
+          border: '1px solid black', 
+          backgroundColor: 'white', 
+          color: 'black',
+          borderRadius: '10px'
+        }}
+        key={post.id}
+      >
+        <div style={{ padding: '10px', marginBottom: '10px' }}> 
           {post.id === editPostId ? (
             <div>
-              <input type="text" value={input} onChange={handleChange} />
-              <button onClick={handleSavePostEdit}>Save</button>
+              <input
+                type="text"
+                value={input}
+                onChange={handleChange}
+                style={{
+                  marginBottom: '10px', 
+                  padding: '8px', 
+                  width: '100%' 
+                }}
+              />
+              <button
+                style={{
+                  border: 'none',
+                  borderRadius: '5px',
+                  padding: '8px 16px',
+                  marginRight: '10px', 
+                  backgroundColor: 'lightblue', 
+                  color: 'white', 
+                  cursor: 'pointer' 
+                }}
+                onClick={handleSavePostEdit}
+              >
+                Save
+              </button>
             </div>
           ) : (
             <>
               {post.title}
-              <button onClick={() => handlePostEdit(post.id)}>Edit</button>
+              <button 
+                style={{
+                  border: 'none',
+                  borderRadius: '5px', 
+                  padding: '8px 16px', 
+                  marginLeft: '10px',
+                  backgroundColor: 'lightblue', 
+                  color: 'white', 
+                  cursor: 'pointer' 
+                }}
+                onClick={() => handlePostEdit(post.id)}
+              >
+                Edit
+              </button>
+              <button 
+                style={{
+                  border: 'none',
+                  borderRadius: '5px', 
+                  padding: '8px 16px', 
+                  marginLeft: '10px', 
+                  backgroundColor: 'lightblue', 
+                  color: 'white', 
+                  cursor: 'pointer'
+                }}
+                onClick={() => handleDeletePost(post.id)}
+              >
+                Delete
+              </button>
             </>
           )}
         </div>
-      ))}
-      {value}
-      <br />
-      Date: {date.toString()}
-      <br />
-      Day: {getDay()}
-      <br />
-      Month: {getMonth()}
-      <br />
-      <input type="text" onChange={handleChange} />
-      <button
-        onClick={() => {
-          setValue(input);
-        }}
-      >
-      Change The World
-      </button>
+      </div>
+    ))}
+
+
     </div>
   );
 }
